@@ -1,7 +1,7 @@
 #1
 install PM2 and start it for the project always run
-
-#2 
+#Nginx has 
+#2 /etc/nginx/sites-available/default
 Nginx setup is in below
 server {
   # ...

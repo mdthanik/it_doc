@@ -1,32 +1,63 @@
-#1
-install PM2 and start it for the project always run
-#Nginx has 
-#2 /etc/nginx/sites-available/default
-Nginx setup is in below
+sudo apt-get update
+sudo apt-get install nginx
+Step 2:
+Add your site in nginx
+
+sudo vim /etc/nginx/sites-available/default
+Set configuration according to below example. 
+
 server {
-  # ...
+        listen 80;
+        server_name example.com www.example.com;
+        root /var/www/html;
+        index index.html index.htm;
 
-  server_name example.com www.example.com;
+        location / {
+                proxy_pass             http://127.0.0.1:3000;
+                proxy_read_timeout     60;
+                proxy_connect_timeout  60;
+                proxy_redirect         off;
 
-  # ...
-
-  location / {
-    # Reverse proxy for Next server
-    proxy_pass http://localhost:3000;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_set_header X-Forwarded-Host $host;
-    proxy_set_header X-Forwarded-Port $server_port;
-
-    # we need to remove this 404 handling
-    # because of Next's error handling and _next folder
-    # try_files $uri $uri/ =404;
-  }
-
-  # ...
+                # Allow the use of websockets
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host $host;
+                proxy_cache_bypass $http_upgrade;
+        }
 }
+Step 3:
+Restart Nginx server
+
+sudo service nginx restart
+Step 4:
+Setup next.js app by clone from your repo.
+
+git clone https://github.com/sanity-io/example-frontend-next-js.git
+Reach inside the app directory.
+
+cd example-frontend-next-js
+Now you need to install dependencies and build the app.
+
+yarn # Install dependencies
+yarn build # build our app for production
+yarn global add pm2 # install pm2 to keep next app active forever
+Step 5:
+Start your app with PM2
+
+ 
+
+
+pm2 start npm --name "nextapp" -- start # start next app
+Now your app is live. 
+
+To check PM2 status run the command.
+
+pm2 status
+To stop your app you need to run the following command
+
+pm2 stop nextapp # Here nextapp is your app name in PM2
+To update your app run the command.
+
+yarn build # Rebuild app for production
+pm2 restart nextapp # Here nextapp is your app name

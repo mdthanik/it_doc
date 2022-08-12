@@ -1,0 +1,6 @@
+i) show list 
+wsl --list
+ii) change default
+wsl --setdefault DISTRO_NAME
+iii) get linux version name
+lsb_release -a

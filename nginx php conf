@@ -1,0 +1,14 @@
+server {
+        listen 80;
+        listen [::]:80;
+        server_name backend.yiniminiedu.com www.backend.yiniminiedu.com;
+        root /var/www/yiniminiedu_backend/public/;
+
+        location / {
+                try_files $uri $uri/ /index.php?$query_string;
+        }
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+        } index index.html index.php;
+}

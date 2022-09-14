@@ -1,1 +1,20 @@
+$media = $request->file('media');
+        $name = time(). $project->id . "_" . $project->project_name . "." . $media->extension();
+        $path = "projects" . "/" . $project->id . "/" . "projects/" . $name;
 
+        try {
+            $upload = Storage::disk('s3')->put($path, file_get_contents($media));
+
+            if ($upload) {
+                Storage::disk('s3')->setVisibility($path, 'public');
+            }
+            $test =  env('AWS_STORAGE_URL') .'/'.$path;
+
+            $project->media()->create([
+                'url' => env('AWS_STORAGE_URL') .'/'.$path,
+                'file_path' => $path,
+            ]);
+            return back()->withSuccess("Successfully Added!");
+        } catch (S3Exception $e) {
+            echo $e->getMessage();
+        }
